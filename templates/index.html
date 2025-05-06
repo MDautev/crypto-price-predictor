@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Price Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Crypto Price Prediction (30 days + next 7)</h1>
+
+    <label for="coinSelect">Избери криптовалута:</label>
+    <select id="coinSelect" onchange="reloadChart()">
+        <option value="bitcoin">Bitcoin</option>
+        <option value="ethereum">Ethereum</option>
+        <option value="solana">Solana</option>
+        <option value="dogecoin">Dogecoin</option>
+    </select>
+
+    <canvas id="cryptoChart" width="400" height="200"></canvas>
+
+    <script>
+        let chart = null;
+
+        function reloadChart() {
+            const coin = document.getElementById('coinSelect').value;
+            let timestamps = [];
+            let prices = [];
+
+            fetch(`/api/get_crypto_data?coin=${coin}`)
+                .then(response => response.json())
+                .then(data => {
+                    timestamps = data.prices.map(price => new Date(price[0]).toLocaleDateString());
+                    prices = data.prices.map(price => price[1]);
+
+                    return fetch(`/api/predict?coin=${coin}`);
+                })
+                .then(response => response.json())
+                .then(predData => {
+                    const predictedPrices = predData.predicted_prices;
+                    const lastDate = new Date(timestamps[timestamps.length - 1]);
+
+                    const futureDates = [];
+                    for (let i = 1; i <= predictedPrices.length; i++) {
+                        const date = new Date(lastDate);
+                        date.setDate(date.getDate() + i);
+                        futureDates.push(date.toLocaleDateString());
+                    }
+
+                    const extendedLabels = timestamps.concat(futureDates);
+                    const fullHistorical = prices.concat(Array(predictedPrices.length).fill(null));
+                    const fullPrediction = Array(prices.length).fill(null).concat(predictedPrices);
+
+                    if (chart) {
+                        chart.destroy();
+                    }
+
+                    const ctx = document.getElementById('cryptoChart').getContext('2d');
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: extendedLabels,
+                            datasets: [
+                                {
+                                    label: `${coin.toUpperCase()} Price (USD)`,
+                                    data: fullHistorical,
+                                    borderColor: 'rgba(75, 192, 192, 1)',
+                                    fill: false,
+                                    tension: 0.1
+                                },
+                                {
+                                    label: 'Predicted Price (Next 7 Days)',
+                                    data: fullPrediction,
+                                    borderColor: 'rgba(255, 99, 132, 1)',
+                                    borderDash: [5, 5],
+                                    fill: false,
+                                    tension: 0.1
+                                }
+                            ]
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading data:', error));
+        }
+
+        // Първоначално зареждане за Bitcoin
+        reloadChart();
+    </script>
+</body>
+</html>
