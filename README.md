@@ -1,4 +1,4 @@
-````markdown
+```markdown
 # 🪙 Crypto Price Predictor
 
 A simple web app that displays historical prices for selected cryptocurrencies over the past 30 days and predicts their prices for the next 7 days using basic linear regression.
@@ -17,7 +17,7 @@ A simple web app that displays historical prices for selected cryptocurrencies o
 - Built with Python (Flask), JavaScript, HTML/CSS
 
 ---
-
+```
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
@@ -26,7 +26,6 @@ A simple web app that displays historical prices for selected cryptocurrencies o
 git clone https://github.com/your-username/crypto-price-predictor.git
 cd crypto-price-predictor
 ```
-````
 
 ### 2. Install Dependencies
 
@@ -49,7 +48,7 @@ Visit:
 ```cpp
 http://127.0.0.1:5000
 ```
-
+```markdown
 ### 🧠 How It Works
 
 The app uses the CoinGecko API to retrieve the last 30 days of price data.
@@ -72,7 +71,4 @@ Predicted prices (dashed line)
 🧑‍💻 Author
 Created by MDautev
 Inspired by the desire to build a simple, educational crypto prediction app.
-
-```
-
 ```
